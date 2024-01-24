@@ -1,46 +1,57 @@
 "use client"
 
-import { useEffect, useState } from 'react';
-import anime from 'animejs/lib/anime.es.js';
-import Typewriter from 'typewriter-effect/dist/core';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const [audio, setAudio] = useState(null);
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null);
 
   useEffect(() => {
-    setAudio(new Audio('intro.mp3'));
-    anime({
-      targets: '.agent-circle',
-      scale: [
-        { value: .9, easing: 'easeOutSine', duration: 500 },
-        { value: 1, easing: 'easeInOutQuad', duration: 1200 }
-      ],
-      borderRadius: ['80%', '100%'],
-      easing: 'easeInOutQuad',
-      duration: 2000,
-      loop: true
-    });
+    async function setupRecorder() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = handleDataAvailable;
+        setMediaRecorder(recorder);
+      } catch (error) {
+        console.error('Error accessing microphone', error);
+      }
+    }
+    setupRecorder();
   }, []);
 
-  const playAudioAndType = () => {
-    if (audio) {
+  const handleDataAvailable = (e) => {
+    setAudioBlob(e.data);
+  };
+
+  useEffect(() => {
+    if (audioBlob && !recording) {
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
       audio.play();
     }
-    const typewriter = new Typewriter('#typewriter', {
-      loop: false,
-      delay: 75,
-    });
+  }, [audioBlob, recording]);
 
-    typewriter
-      .typeString("What's your name?")
-      .start();
+  function toggleRecording () {
+    if (!mediaRecorder) return;
+    if (recording) {
+      mediaRecorder.stop();
+    } else {
+      mediaRecorder.start();
+      setAudioBlob(null);
+    }
+    setRecording(!recording);
   };
 
   return (
-    <main className="flex h-screen flex-col items-center bg-gradient-to-t from-rose-600 via-red-500 to-red-600">
+    <main className="flex h-screen flex-col items-center bg-gradient-to-t from-rose-600 via-red-500 to-red-600 text-white">
       <div className="flex flex-col items-center justify-center space-y-12 mt-[240px]">
-        <div className="agent-circle bg-white h-[160px] w-[160px] rounded-full" onClick={playAudioAndType}></div>
-        <h2 id="typewriter" className="text-xl sm:text-2xl md:text-4xl font-bold"></h2>
+        <div 
+          className={`agent-circle h-[160px] w-[160px] rounded-full shadow-2xl ${recording ? 'bg-white/40' : 'bg-white'}`} 
+          onClick={toggleRecording}
+        ></div>
+        <h2 className="text-xl sm:text-2xl md:text-4xl font-bold">Hi</h2>
       </div>
     </main>
   );
