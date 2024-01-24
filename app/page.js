@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import anime from 'animejs/lib/anime.es.js';
+import Typewriter from 'typewriter-effect/dist/core';
 
 export default function Home() {
   const [audio, setAudio] = useState(null);
@@ -21,17 +22,25 @@ export default function Home() {
     });
   }, []);
 
-  const playAudio = () => {
+  const playAudioAndType = () => {
     if (audio) {
       audio.play();
     }
+    const typewriter = new Typewriter('#typewriter', {
+      loop: false,
+      delay: 75,
+    });
+
+    typewriter
+      .typeString("What's your name?")
+      .start();
   };
 
   return (
     <main className="flex h-screen flex-col items-center bg-gradient-to-t from-rose-600 via-red-500 to-red-600">
       <div className="flex flex-col items-center justify-center space-y-12 mt-[240px]">
-        <div className="agent-circle bg-white h-[160px] w-[160px] rounded-full" onClick={playAudio}></div>
-        <h2 className="text-xl sm:text-2xl md:text-4xl font-bold">What&apos;s your name?</h2>
+        <div className="agent-circle bg-white h-[160px] w-[160px] rounded-full" onClick={playAudioAndType}></div>
+        <h2 id="typewriter" className="text-xl sm:text-2xl md:text-4xl font-bold"></h2>
       </div>
     </main>
   );
