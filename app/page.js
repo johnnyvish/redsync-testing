@@ -19,9 +19,9 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-gradient-to-t from-rose-600 via-red-500 to-red-600">
-      <div className="flex flex-col items-center justify-center space-y-12">
-        <div className="agent-circle bg-white h-[160px] w-[160px] rounded-full mt-[240px]"></div>
+    <main className="flex h-screen flex-col items-center bg-gradient-to-t from-rose-600 via-red-500 to-red-600">
+      <div className="flex flex-col items-center justify-center space-y-12  mt-[240px]">
+        <div className="agent-circle bg-white h-[160px] w-[160px] rounded-full"></div>
         <h2 className="text-xl sm:text-2xl md:text-4xl font-bold">Hi, how can I help you today?</h2>
       </div>
     </main>
