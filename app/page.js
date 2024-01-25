@@ -18,12 +18,12 @@ export default function Home() {
         </button>
         {recording && (
           <div className="flex justify-center items-center space-x-4">
-            <p className="text-4xl text-[#07DEFF] font-bold">Listening</p>
-            <div className="loading-dots">
+            <p className="text-4xl text-white font-bold">Listening...</p>
+            {/* <div className="loading-dots">
               <div></div>
               <div></div>
               <div></div>
-            </div>
+            </div> */}
           </div>
         )}
       </div>
