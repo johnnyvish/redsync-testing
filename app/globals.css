@@ -21,6 +21,10 @@
   animation: scaleAndRound 2000ms ease-in-out infinite;
 }
 
+.listening{
+  animation: colorshift 2000ms ease-in-out infinite;
+}
+
 .loading-dots div {
   height: 24px;
   width: 24px;
@@ -55,4 +59,28 @@
     transform: scale(1);
     background-color: #0761FF;
   }
+}
+
+@keyframes colorshift {
+  0%, 100% {
+    color: #30FFB7;
+  }
+  40% {
+    color: #07DEFF;
+  }
+  50% {
+    color: #0761FF;
+  }
+}
+
+.typewriter-container {
+  width: 600px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 600px }
 }
