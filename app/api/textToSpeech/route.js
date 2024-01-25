@@ -14,9 +14,10 @@ export async function POST(request) {
     return new NextResponse(audioData, {
       status: 200,
       headers: {
-        'Content-Type': 'audio/mpeg' // Ensure this matches the audio format
+        'Content-Type': 'audio/mpeg'
       }
     });
+    
   } catch (error) {
     if (error.response) {
       console.error(error.response.status, error.response.data);

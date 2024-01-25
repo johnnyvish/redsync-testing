@@ -5,15 +5,11 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-console.log("OpenAI API Key set:", Boolean(process.env.OPENAI_API_KEY));
-
 export async function POST(request) {
   try {
     const req = await request.json();
     const inputText = req.text;
-    console.log("Received text:", inputText);
 
-    console.log("Sending request to OpenAI...");
     const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
@@ -21,7 +17,6 @@ export async function POST(request) {
             { "role": "user", "content": inputText }
         ],
     });
-    console.log("Response received from OpenAI:", response);
 
     const outputText = response.choices[0].message.content;
 
