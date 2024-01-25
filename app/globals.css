@@ -21,10 +21,6 @@
   animation: scaleAndRound 2000ms ease-in-out infinite;
 }
 
-.listening{
-  animation: colorshift 2000ms ease-in-out infinite;
-}
-
 .loading-dots div {
   height: 24px;
   width: 24px;
@@ -58,18 +54,6 @@
   50% {
     transform: scale(1);
     background-color: #0761FF;
-  }
-}
-
-@keyframes colorshift {
-  0%, 100% {
-    color: #30FFB7;
-  }
-  40% {
-    color: #07DEFF;
-  }
-  50% {
-    color: #0761FF;
   }
 }
 
