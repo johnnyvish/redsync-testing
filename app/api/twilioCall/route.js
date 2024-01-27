@@ -18,7 +18,7 @@ export async function POST(req) {
         const message = await client.calls.create({
             url: 'http://demo.twilio.com/docs/voice.xml',
             from: "+18888315983",
-            to: "+17323097782", // The phone number is now dynamic based on client input            
+            to: "+12019687506", // The phone number is now dynamic based on client input            
         });
 
         console.log(`Call sent successfully. SID: ${message.sid}`);
