@@ -98,6 +98,7 @@ export default function Home() {
           throw new Error(`Request failed with status ${response.status}`);
         }
         setTranscription(data.result);
+        console.log(transcription);
       }
     } catch (error) {
       console.error('Error transcribing audio', error);
