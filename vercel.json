@@ -2,7 +2,7 @@
     "crons": [
       {
         "path": "/api/twilioCall",
-        "schedule": "18 20 * * *"
+        "schedule": "18 24 * * *"
       }
     ]
   }
