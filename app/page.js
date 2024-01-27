@@ -45,6 +45,8 @@ export default function Home() {
       const timer = setTimeout(() => {
         setCurrentSubtitle(subtitles[subtitleIndex]);
         setSubtitleIndex(subtitleIndex + 1);
+        console.log(currentSubtitle);
+     
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -67,6 +69,45 @@ export default function Home() {
     }
   };
 
+  const sendMessage = async (body, to) => {
+
+    const res = await fetch('/api/twilio', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ body, to }), // Updated to match server-side code
+    });
+
+    const data = await res.json();
+    console.log(data);
+};
+
+const initiateCall = async (url, to) => {
+  try {
+      const response = await fetch('/api/twilioCall', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url, to }), // Assuming 'to' is the phone number
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+          console.log('Call initiated successfully', data);
+      } else {
+          console.error('Failed to initiate call', data.error);
+      }
+  } catch (error) {
+      console.error('Error making request to /api/send-call', error);
+  }
+};
+
+
+
+
+
   useEffect(() => {
     if (!recording && audioChunks.length) {
       const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
@@ -78,6 +119,11 @@ export default function Home() {
     if (transcription) {
       promptGPT(transcription);
     }
+  }, [transcription]);
+
+  useEffect(() => {
+    console.log("Updated transcript: ", transcription);
+    sendMessage(transcription, "+17323097782")
   }, [transcription]);
 
   async function speechToText(audioBlob) {
@@ -98,7 +144,21 @@ export default function Home() {
           throw new Error(`Request failed with status ${response.status}`);
         }
         setTranscription(data.result);
-        console.log(transcription);
+
+        const timer = setTimeout(() => {
+          console.log("timer reached");
+        
+       
+        }, 5000);
+        console.log(transcription)
+
+        
+        console.log("We reached speech to text");
+    //  initiateCall("http://demo.twilio.com/docs/voice.xml", "+17323097782");
+        console.log("data.result: " + data.result);
+       
+        console.log("transcript: ", transcription);
+       
       }
     } catch (error) {
       console.error('Error transcribing audio', error);
