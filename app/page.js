@@ -1,252 +1,115 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [audioChunks, setAudioChunks] = useState([]);
-  const [transcription, setTranscription] = useState(null);
-  const [audioUrl, setAudioUrl] = useState(null);
-  const [gptResponse, setGPTResponse] = useState("");
-  const [currentSubtitle, setCurrentSubtitle] = useState('');
-  const [subtitleIndex, setSubtitleIndex] = useState(0);
-  const [subtitles, setSubtitles] = useState([]);
+  const [showLoadingDots, setShowLoadingDots] = useState(false);
+  const [showImages, setShowImages] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [subtitle, setSubtitle] = useState("");
+  const firstClickRef = useRef(true);
 
-  useEffect(() => {
-    async function setupRecorder() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
-        recorder.ondataavailable = event => {
-          setAudioChunks(currentChunks => [...currentChunks, event.data]);
-        };
-        setMediaRecorder(recorder);
-      } catch (error) {
-        console.error('Error accessing microphone', error);
-      }
-    }
-    setupRecorder();
-  }, []);
+  const audioList = ["/1.mp3", "/2.mp3"];
+  const subtitles = [
+    "Did you eat any leafy greens today? And did you eat any fruits or vegetables?",
+    "Well, that’s ok. Let’s aim small and try to eat 100 grams berries once this week to start building a habit. Why don’t we take a look at your sleep data?",
+  ];
+  const imageList = ["/image1.jpg", "/image2.jpg", "/image3.jpg"];
 
-  useEffect(() => {
-    if (gptResponse) {
-      const words = gptResponse.split(' ');
-      const chunks = [];
-      for (let i = 0; i < words.length; i += 7) {
-        chunks.push(words.slice(i, i + 7).join(' '));
-      }
-      setSubtitles(chunks);
-    }
-  }, [gptResponse]);
+  function toggleRecording() {
+    if (firstClickRef.current) {
+      // Play the first audio clip on the first click
+      new Audio(audioList[0]).play();
+      setSubtitle(subtitles[0]);
+      firstClickRef.current = false;
+    } else {
+      // Toggle recording state
+      setRecording(!recording);
 
-  useEffect(() => {
-    if (subtitleIndex < subtitles.length) {
-      const timer = setTimeout(() => {
-        setCurrentSubtitle(subtitles[subtitleIndex]);
-        setSubtitleIndex(subtitleIndex + 1);
-        console.log(currentSubtitle);
-     
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [subtitleIndex, subtitles]);
+      if (recording) {
+        // Simulate thinking phase
+        setShowLoadingDots(true);
+        setTimeout(() => {
+          setShowLoadingDots(false);
+          // Play the second audio clip after the thinking phase
+          new Audio(audioList[1]).play();
+          setSubtitle(subtitles[1]);
 
-  function startRecording () {
-    if (mediaRecorder) {
-      mediaRecorder.start();
-      setAudioChunks([]);
-      setRecording(true);
-    }
-    setCurrentSubtitle("");
-    setSubtitles([])
-  };
-
-  function stopRecording () {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      setRecording(false);
-    }
-  };
-
-  const sendMessage = async (body, to) => {
-
-    const res = await fetch('/api/twilio', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ body, to }), // Updated to match server-side code
-    });
-
-    const data = await res.json();
-    console.log(data);
-};
-
-const initiateCall = async (url, to) => {
-  try {
-      const response = await fetch('/api/twilioCall', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ url, to }), // Assuming 'to' is the phone number
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-          console.log('Call initiated successfully', data);
+          // Start showing images 5 seconds after the 2nd clip starts
+          setTimeout(() => {
+            setShowImages(true);
+          }, 10000);
+        }, 2000); // Loading dots displayed for 2 seconds
       } else {
-          console.error('Failed to initiate call', data.error);
+        // Hide images and subtitles when recording starts
+        setShowImages(false);
+        setSubtitle("");
       }
-  } catch (error) {
-      console.error('Error making request to /api/send-call', error);
-  }
-};
-
-
-
-
-
-  useEffect(() => {
-    if (!recording && audioChunks.length) {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-      speechToText(audioBlob);
-    }
-  }, [recording, audioChunks]);
-
-  useEffect(() => {
-    if (transcription) {
-      promptGPT(transcription);
-    }
-  }, [transcription]);
-
-  useEffect(() => {
-    console.log("Updated transcript: ", transcription);
-    sendMessage(transcription, "+17323097782")
-  }, [transcription]);
-
-  async function speechToText(audioBlob) {
-    try {
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
-      reader.onloadend = async function () {
-        const base64Audio = reader.result.split(',')[1];
-        const response = await fetch('/api/speechToText', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ audio: base64Audio }),
-        });
-        const data = await response.json();
-        if (response.status !== 200) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-        setTranscription(data.result);
-
-        const timer = setTimeout(() => {
-          console.log("timer reached");
-        
-       
-        }, 5000);
-        console.log(transcription)
-
-        
-        console.log("We reached speech to text");
-    //  initiateCall("http://demo.twilio.com/docs/voice.xml", "+17323097782");
-        console.log("data.result: " + data.result);
-       
-        console.log("transcript: ", transcription);
-       
-      }
-    } catch (error) {
-      console.error('Error transcribing audio', error);
-    }
-  };
-
-  async function textToSpeech(text) {
-    try {
-      const response = await fetch('/api/textToSpeech', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text }),
-      });
-      if (response.status === 200) {
-        const blob = await response.blob();
-        const audioUrl = URL.createObjectURL(blob);
-        setAudioUrl(audioUrl);
-        playAudio(audioUrl);
-      } else {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-    } catch (error) {
-      console.error('Error converting text to speech', error);
-    }
-  }  
-
-  async function promptGPT(text) {
-    try {
-      const response = await fetch('/api/gpt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text }),
-      });
-      if (response.status === 200) {
-        const data = await response.json();
-        setGPTResponse(data.result)
-        textToSpeech(data.result);
-      } else {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-    } catch (error) {
-      console.error('Error processing text through gpt', error);
     }
   }
 
-  async function playAudio(url) {
-    try {
-      const audio = new Audio(url);
-      await new Promise((resolve, reject) => {
-        audio.addEventListener('loadeddata', resolve);
-        audio.addEventListener('error', () => reject(new Error('Failed to load audio')));
-      });
-
-      if (!audio.paused) {
-        return;
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === " ") {
+        event.preventDefault();
+        toggleRecording();
       }
-      await audio.play();
-    } catch (error) {
-      console.error('Error in playAudio function:', error);
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [recording]);
+
+  useEffect(() => {
+    let imageRotationInterval = null;
+
+    if (showImages) {
+      imageRotationInterval = setInterval(() => {
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
+      }, 5000); // Rotate images every 7 seconds
     }
-  }
-  
-  
+
+    return () => {
+      if (imageRotationInterval) {
+        clearInterval(imageRotationInterval);
+      }
+    };
+  }, [showImages, imageList.length]);
+
   return (
     <main className="flex h-screen flex-col items-center bg-gradient-to-t from-rose-600 via-red-500 to-red-600 text-white">
       <div className="flex flex-col items-center justify-center space-y-12 mt-[240px]">
-        <button className={`h-[160px] w-[160px] rounded-full shadow-2xl bg-white ${recording ? 'agent-circle' : ''}`}
-          onClick={recording ? stopRecording : startRecording}>
-        </button>
+        <button
+          className={`h-[160px] w-[160px] rounded-full shadow-2xl bg-white ${
+            recording ? "agent-circle" : ""
+          }`}
+          onClick={toggleRecording}
+        ></button>
+        {subtitle && (
+          <p className="text-center text-lg max-w-md mx-auto">{subtitle}</p>
+        )}
         {recording && (
           <div className="flex justify-center items-center space-x-4">
-            <p className="listening text-4xl text-white font-bold">Listening</p>
-            <div className="loading-dots">
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
+            <p className="text-4xl text-white font-bold">Listening...</p>
           </div>
         )}
-        {!recording && currentSubtitle && (
-        <div className="flex justify-center items-center text-2xl font-bold">
-          <p>{currentSubtitle}</p>
-        </div>
-      )}
+        {showLoadingDots && (
+          <div className="loading-dots flex justify-center items-center">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        )}
+        {showImages && (
+          <img
+            className="w-[200px] rounded-2xl floating"
+            src={imageList[currentImageIndex]}
+            alt="Displayed Image"
+          />
+        )}
       </div>
     </main>
   );
