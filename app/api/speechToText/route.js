@@ -11,8 +11,8 @@ export async function POST(request) {
   const base64Audio = req.audio;
   const audio = Buffer.from(base64Audio, 'base64');
   try {
-    // const text = await convertAudioToText(audio);
-    return NextResponse.json({ result: "hello test" }, { status: 200 });
+    const text = await convertAudioToText(audio);
+    return NextResponse.json({ result: text }, { status: 200 });
   } catch (error) {
     if (error.response) {
       console.error(error.response.status, error.response.data);
