@@ -25,7 +25,7 @@ export async function POST(request) {
 }
 
 async function convertAudioToText(audioData) {
-  const inputPath = '/tmp/input.mp3';
+  const inputPath = '/tmp/input.m4a';
   fs.writeFileSync(inputPath, audioData);
   const file = await toFile(fs.createReadStream(inputPath))
   const response = await openai.audio.transcriptions.create({
