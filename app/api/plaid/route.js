@@ -2,11 +2,11 @@ import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
 import { NextResponse } from "next/server";
 
 const configuration = new Configuration({
-  basePath: PlaidEnvironments.development,
+  basePath: PlaidEnvironments.sandbox,
   baseOptions: {
     headers: {
       "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
-      "PLAID-SECRET": process.env.PLAID_SECRET,
+      "PLAID-SECRET": process.env.PLAID_SANDBOX_SECRET,
     },
   },
 });
