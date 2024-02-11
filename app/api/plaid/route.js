@@ -19,10 +19,21 @@ export async function GET() {
       client_user_id: "user-abc",
       email_address: "user@example.com",
     },
-    products: ["investments"],
-    client_name: "Investment Tracker",
-    language: "en",
+    client_name: "RedSync",
+    products: ["transactions"],
+    transactions: {
+      days_requested: 730,
+    },
     country_codes: ["US"],
+    language: "en",
+    account_filters: {
+      depository: {
+        account_subtypes: ["checking", "savings"],
+      },
+      credit: {
+        account_subtypes: ["credit card"],
+      },
+    },
   };
 
   try {
