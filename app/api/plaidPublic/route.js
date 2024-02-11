@@ -16,16 +16,36 @@ const plaidClient = new PlaidApi(configuration);
 export async function POST(request) {
   try {
     const req = await request.json();
-    const token = req.token;
-    const response = await plaidClient.itemPublicTokenExchange({
-      public_token: token,
+    const publicToken = req.token;
+    // Exchange public token for access token
+    const exchangeResponse = await plaidClient.itemPublicTokenExchange({
+      public_token: publicToken,
     });
-    const accessToken = response.data.access_token;
-    return NextResponse.json({ result: accessToken }, { status: 200 });
+    const accessToken = exchangeResponse.data.access_token;
+
+    // Now fetch transactions using the access token
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+    const startDate = thirtyDaysAgo.toISOString().split("T")[0];
+    const endDate = new Date().toISOString().split("T")[0];
+
+    const transactionsResponse = await plaidClient.transactionsGet({
+      access_token: accessToken,
+      start_date: startDate,
+      end_date: endDate,
+      options: {
+        count: 10, // Adjust this value as needed
+      },
+    });
+
+    const transactions = transactionsResponse.data.transactions;
+
+    // Return the transactions in the response
+    return NextResponse.json({ result: transactions }, { status: 200 });
   } catch (error) {
-    console.error(`Error with Plaid access token request: ${error.message}`);
+    console.error(`Error in Plaid transactions request: ${error.message}`);
     return NextResponse.json(
-      { error: "An error occurred during your plaid access token request." },
+      { error: "An error occurred during the Plaid transactions request." },
       { status: 500 }
     );
   }
