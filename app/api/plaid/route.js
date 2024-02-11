@@ -14,14 +14,15 @@ const configuration = new Configuration({
 const plaidClient = new PlaidApi(configuration);
 
 export async function GET() {
-  //   const req = await request.json();
   const request = {
     user: {
-      client_user_id: "user-id-123",
+      client_user_id: "user-abc",
+      email_address: "user@example.com",
     },
-    client_name: "Redsync",
-    country_codes: ["US"],
+    products: ["investments"],
+    client_name: "Investment Tracker",
     language: "en",
+    country_codes: ["US"],
   };
 
   try {
