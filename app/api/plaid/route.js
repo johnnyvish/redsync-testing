@@ -26,6 +26,7 @@ export async function GET() {
     },
     country_codes: ["US"],
     language: "en",
+    android_package_name: "com.johnnyvish.redsyncnative",
     account_filters: {
       depository: {
         account_subtypes: ["checking", "savings"],
