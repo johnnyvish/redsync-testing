@@ -16,13 +16,24 @@ const plaidClient = new PlaidApi(configuration);
 export async function GET() {
   const request = {
     user: {
-      client_user_id: "user-abc",
-      email_address: "user@example.com",
+      client_user_id: "user-id",
+      phone_number: "+1 415 5550123",
     },
-    client_name: "redsync",
+    client_name: "Personal Finance App",
     products: ["transactions"],
+    transactions: {
+      days_requested: 730,
+    },
     country_codes: ["US"],
     language: "en",
+    account_filters: {
+      depository: {
+        account_subtypes: ["checking", "savings"],
+      },
+      credit: {
+        account_subtypes: ["credit card"],
+      },
+    },
   };
 
   try {
