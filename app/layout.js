@@ -5,7 +5,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "RedSync",
-  description: "Building sustainable habits using A.I",
+  description: "Personalized health tracker assistant",
 };
 
 export default function RootLayout({ children }) {

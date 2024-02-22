@@ -1,9 +1,0 @@
-{
-    "crons": [
-      {
-        "path": "/api/twilioCall",
-        "schedule": "26 20 * * *"
-      }
-    ]
-  }
-  
