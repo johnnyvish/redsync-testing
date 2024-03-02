@@ -282,6 +282,10 @@ export default function Home() {
         <h1 className="text-red-800">Red</h1>
         <h1 className="text-gray-800">Sync</h1>
       </div>
+      {/* <div className="fixed top-8 left-8 flex text-3xl font-bold z-[1000] bg-white rounded-[2rem] pt-2 pb-2 pl-4 pr-4">
+        <h1 className="text-red-800">Red</h1>
+        <h1 className="text-gray-800">Sync</h1>
+      </div> */}
       {/* make navigation on the right for desktop, middle on phone and responsive. */}
       <nav className="fixed top-8 z-[1000] w-full px-4 md:px-0">
         <div className="max-w-[95%] md:max-w-none mx-auto md:mx-0 md:absolute md:right-10">
